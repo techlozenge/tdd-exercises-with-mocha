@@ -1,0 +1,283 @@
+TDD: Test Driven Development
+
+There are many forms of testing in software development.
+
+Unit testing, integration testing, web testing (aka functional testing), performance testing, acceptance testing, security testing, fuzz testing, manual testing, etc.
+
+Today we will be focused on automated testing in JavaScript, specifically:
+
+Unit Tests and TDD with Mocha and Chai.
+http://mochajs.org/
+http://chaijs.com/
+
+The Value in Automated Testing
+
+        "Automated forms of testing are more valuable when your project has a long life span, a large team working on it, or if the software significantly impacts the bottom line of the business."
+
+    Without a suite of regression tests to rely on, the longer a project goes on and the more fingers in the code, the more likely it is that code is changed by people who didn't originally write it (or understand it or forgot about how it worked) and then the software becomes buggy and broken. The way this is often combatted is with extensive, slow, error prone, manual testing by QA teams or devs themselves. Yuck.
+
+    So, even though it will be harder to see the value in automated testing while at The Iron Yard (since projects are such short lived and teams are small) you would be best served to embrace professionalism when writing software and write a suite of automated tests for your projects. You will produce higher quality code and it will also open you to more employment opportunities.
+
+Assertions
+
+    assert() is part of node.js
+
+    Assert some truth about reality:
+
+        assert(false || true, 'silently succeeds')
+
+        assert(false && true, 'noisily raises an error')
+
+    There are many assertion methods:
+
+        assert(value[, message])
+
+        assert.equal(actual, expected[, message])
+
+        assert.notEqual(actual, expected[, message])
+
+        assert.fail(actual, expected, message, operator)
+
+        etc, etc..
+
+        Assert documentation: https://nodejs.org/api/assert.html
+
+Unit Testing
+
+    Let's create a function called greet that returns a friendly greeting for a person:
+
+        Create greet.js .
+
+        function greet(person) {
+        return 'hi, ' + person;
+        }
+
+        module.exports = greet;
+
+    Does that code work? How do we test that it our function works?
+
+    What if we change that code? How do we ensure that we didn't break anything?
+
+    Let's create unit tests for our greet function that check that it works as we expect it to.
+
+        Create greet_test.js .
+
+        var assert = require('assert');
+        var greet = require('./greet');
+
+        function testGreetMom() {
+        try{
+            assert(greet('mom') == 'hi, mom');
+            console.log("testGreetMom passed!")
+        }catch(e){
+            console.log("testGreetMom failed!")
+        }
+        }
+
+        function testGreetDad() {
+        try{
+            assert(greet('dad') == 'hi, dad');
+            console.log("testGreetDad passed!")
+        }catch(e){
+            console.log("testGreetDad failed!")
+        }
+        }
+
+        testGreetMom();
+        testGreetDad();
+
+    What happens if we change the implementation of greet and then run the test again?
+
+    Why is this called unit testing? What is a unit here? What else would be considered a unit?
+
+    Why would what we just did not be considered TDD?
+        BECAUSE WE WROTE THE TEST AFTER THE APP
+
+Arrange, Act, Assert
+
+    There are three steps to writing a unit test:
+
+        ARRANGE - instantiate an object or data structure.
+        ACT - call a method on the object.
+        ASSERT - assert on the return value or state of object.
+
+    During the ARRANGE step you instantiate objects, create variables, and call initialization methods.
+
+    During the ACT step you call the method that you want to test, usually storing the return value in a variable.
+
+    During the ASSERT step you call an assertion or expectation function with the return value or on attributes of an object to ensure you got the result you expected.
+
+    Here is an example of unit testing two objects using the Arrange, Act, Assert pattern:
+
+    Let's review the following
+
+        var assert = require('assert');
+        var character = require('./character');
+
+        function testCombat() {
+        // ARRANGE
+        var player1 = new Character({
+            name: 'Player 1',
+            health: 50,
+            weapon: { name: 'BF Sword', damage: 99 }
+        });
+
+        var player2 = new Character({
+            name: 'Player 2',
+            health: 50,
+            weapon: { name: 'Lichbane', damage: 27 }
+        });
+
+        // ACT
+        player1.attack(player2);
+
+        // ASSERT
+        assert(!player2.isAlive());
+        }
+
+        testCombat();
+
+TDD
+
+    Test-driven development is the art of writing a failing unit test first before writing any implementation code that gets that test to pass. With TDD you can work incrementally, taking as tiny of steps as necessary, building application functionality from the bottom-up.
+
+    The TDD Mantra: Red, Green, Refactor
+
+    There are three steps to TDD:
+
+        RED - Write a failing test.
+
+        GREEN - Write the code that gets it to pass.
+
+        REFACTOR - Clean up any mess you made and repeat back at step 1.
+
+    TDD is about Designing
+
+    TDD is less about testing and more about designing.
+
+    The act of writing a failing test first is an act of design.
+
+    By writing a failing test, you are writing the code you wish you had, the "wouldn't it be awesome if it worked this way" code, even though you don't have that functionality quite yet.
+
+    Sure, having a unit test suite is great for regression testing purposes, but TDD is more about getting your interfaces (function/method signatures and classes) right.
+
+TDD with Mocha and Chai
+
+    I recently turned 30 years old, what can I do?
+
+    There are many things that we can do in the US based on age. Here are a few:
+
+    At 18, you may vote and legally enter contracts.
+    At 21, you may purchase and consume alcohol.
+    At 25, you may be a representative.
+    At 30, you may be a senator.
+    At 35, you may be president.
+
+    Let's write a function using TDD to let someone know what they can do given their date of birth.
+
+    CREATE NEW PROJECT
+
+    mkdir what_can_i_do
+
+    cd what_can_i_do
+
+    npm init -f
+
+    npm install --save-dev mocha
+
+    npm install --save-dev chai
+
+    mkdir test
+
+    Create test/person.js:
+
+        var Person = require('../person');
+        var chai = require('chai');
+        var expect = chai.expect;
+
+        describe('Person', function() {
+        describe('#age()', function() {
+            context('when dob is 10/20/1992', function() {
+            it('returns 23 for persons age', function() {
+                var person = new Person('10/20/1992');
+                var age = person.age();
+                expect(age).to.equal(23);
+            });
+            });
+
+            context('when dob is 09/03/1986', function() {
+            it('returns 30 for persons age', function() {
+                var person = new Person('09/03/1986');
+                var age = person.age();
+                expect(age).to.equal(30);
+            });
+            });
+        });
+        });
+
+        RUN TESTS
+
+    Other Reporters
+
+    ./node_modules/.bin/mocha --reporter spec
+
+    npm install --global mocha
+
+    mocha
+
+    GET TO GREEN
+
+    Implement Code To Pass Test...
+
+    CREATE PERSON.JS
+
+        function Person(dob) {
+        this.dob = new Date(dob);
+        }
+
+        Person.prototype.age = function() {
+        var ageDiff = new Date(Date.now() - this.dob);
+        return Math.abs(ageDiff.getUTCFullYear() - 1970);
+        };
+
+        module.exports = Person;
+
+    mocha
+
+    And now that we are at green... refactor, and...
+
+    BACK TO RED
+
+    Write Our Next Failing Test...
+
+        describe('#whatCanIDo()', function() {
+            context('when age is 18 or more', function() {
+            it('returns vote', function() {
+                var person = new Person('1/1/1995');
+                var what = person.whatCanIDo();
+                expect(what).to.include('vote');
+            });
+            });
+        });
+
+    And Get It To Pass...
+
+        Person.prototype.whatCanIDo = function() {
+        var what = [];
+
+        var age = this.age();
+
+        if (age >= 18) {
+            what.push('vote');
+        }
+
+        return what;
+        };
+
+And Refactor...
+
+https://pragprog.com/screencast/v-kbtdd/test-driven-development
+
+
+
+HERE ENDTH THE LESSON
