@@ -53,4 +53,11 @@ describe('addlExercises', function() {
         });
     });
 
+    context('When sent an array of numbers [8, 3, 5, 1, 9, 10]', function() {
+         it('secondHighest returns the 2nd highest value in the array', function() {
+            var res = addlExercises.secondHighest( [8, 3, 5, 1, 9, 10] );
+            expect(res).to.equal(9);
+        });
+    });
+
 }); // ends describe highestMountain
